@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstring>
 #include <fstream>
+#include <typeinfo>
 #include "grammar.tab.hh"
 
 #include "globals.h"
@@ -42,7 +43,16 @@ int main(int argc, char** argv){
 	std::ofstream of (outputfile, std::ofstream::out);
 
 	// Convert sequential to assembly
-	
+	ContainerNode* cn = root;
+	std::stringstream bodystream;
+	for (std::list<Node*>::iterator i = cn->children.begin(); i != cn->children.end(); i++){
+		Node* child = *i;
+		if (typeid(child) == typeid(TypeNode*)){}
+		else if (dynamic_cast<OperatorNode*>(child) != nullptr){
+			bodystream << ((OperatorNode*)child)->to_asm() << std::endl;
+		}
+	}
+
 	// Data
 	of << ".data" << std::endl;
 	of << std::endl;
@@ -62,6 +72,8 @@ int main(int argc, char** argv){
 	of << "    movq    $_CompilerInfoStr,%rdi" << std::endl; // Set output string as arg1
 	of << "    call    puts" << std::endl; // Call puts
 	of << std::endl;
+	// Insert code
+	of << bodystream.str();
 	// Exit
 	of << "    call exit" << std::endl;
 

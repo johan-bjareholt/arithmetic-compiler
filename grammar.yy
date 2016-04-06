@@ -18,7 +18,16 @@
 %type <ContainerNode*> block
 %type <Node*> exp
 %type <TypeNode*> value
+%type <OperatorNode*> binop
 
+
+
+
+ /* Operators */
+%token <std::string> plus
+%token <std::string> minus
+
+ /* Types */
 %token <std::string> intnum
 %token <std::string> floatnum
 
@@ -41,17 +50,34 @@ block	: exp
 		}
 		;
 
-exp		: value
+exp		: exp binop exp
+		{
+			$$ = $2;
+			$2->children.push_back($1);
+			$2->children.push_back($3);
+		}
+		| value
 	 	{
 			$$ = $1;
 		}
+		;
 
 value	: intnum
 	 	{
-			$$ = new IntNode(std::stoi($1));
+			$$ = new IntNode($1);
 	 	}
 		| floatnum
 		{
-			$$ = new FloatNode(std::stof($1));
+			$$ = new FloatNode($1);
+		}
+		;
+
+binop	: plus
+	  	{
+			$$ = new PlusNode();
+		}
+		| minus
+		{
+			$$ = new MinusNode();
 		}
 		;

@@ -8,17 +8,27 @@
 #include <typeinfo>
 
 void ContainerNode::dumps_str(std::stringstream& ss, int depth) {
-	if (depth == 0)
-		ss << to_str() << std::endl;
+   	for(int i=0; i<depth+1; i++)
+       	ss << " ";
+   	ss << "Container" << std::endl;
     for(std::list<Node*>::iterator i=children.begin(); i!=children.end(); i++){
-		Node* child = *i;
-    	for(int i=0; i<depth+1; i++)
-        	ss << " ";
-    	ss << child->to_str() << std::endl;
-		if (typeid(child) == typeid(ContainerNode*)){
-        	((ContainerNode*)child)->dumps_str(ss, depth+1);
-		}
+		(*i)->dumps_str(ss, depth+1);
 	}
+}
+
+void OperatorNode::dumps_str(std::stringstream& ss, int depth) {
+   	for(int i=0; i<depth+1; i++)
+       	ss << " ";
+   	ss << to_str() << std::endl;
+    for(std::list<Node*>::iterator i=children.begin(); i!=children.end(); i++){
+		(*i)->dumps_str(ss, depth+1);
+	}
+}
+
+void TypeNode::dumps_str(std::stringstream& ss, int depth){
+    for(int i=0; i<depth+1; i++)
+       	ss << " ";
+	ss << to_str() << std::endl;
 }
 
 
@@ -37,24 +47,102 @@ std::string ContainerNode::to_str(){
 	return ss.str();
 }
 
-IntNode::IntNode(int value){
+IntNode::IntNode(std::string value){
 	this->value = value;
 	this->srcline = linenr;
 }
 
 std::string IntNode::to_str(){
 	std::stringstream ss;
-	ss << "int: " << std::to_string(value);
+	ss << "int: " << value;
 	return ss.str();
 }
 
-FloatNode::FloatNode(float value){
+FloatNode::FloatNode(std::string value){
 	this->value = value;
 	this->srcline = linenr;
 }
 
 std::string FloatNode::to_str(){
 	std::stringstream ss;
-	ss << "float: " << std::to_string(value);
+	ss << "float: " << value;
+	return ss.str();
+}
+
+PlusNode::PlusNode(){
+	this->srcline = linenr;
+}
+
+std::string PlusNode::to_str(){
+	std::stringstream ss;
+	ss << "plus: ";
+	return ss.str();
+}
+
+std::string PlusNode::to_asm(){
+	if (dynamic_cast<FloatNode*>(children.front()) || dynamic_cast<FloatNode*>(children.back())){
+		std::cout << "Floats are currently not supported" << std::endl;
+		exit(-1);
+	}
+	TypeNode& op1 = *((TypeNode*)children.front());
+	TypeNode& op2 = *((TypeNode*)children.back());
+	std::stringstream ss;
+	ss << "    ";
+	ss << "movq ";
+  	ss << "$" << op1.value;
+	ss << ",";
+	ss << "%rax";
+	ss << std::endl;
+	
+	ss << "    ";
+	ss << "movq ";
+  	ss << "$" << op2.value;
+	ss << ",";
+	ss << "%rbx";
+	ss << std::endl;
+	
+	ss << "    ";
+	ss << "addq ";
+  	ss << "%rbx" << "," << "%rax";
+	ss << std::endl;
+	return ss.str();
+}
+
+MinusNode::MinusNode(){
+	this->srcline = linenr;
+}
+
+std::string MinusNode::to_str(){
+	std::stringstream ss;
+	ss << "minus: ";
+	return ss.str();
+}
+
+std::string MinusNode::to_asm(){
+	if (dynamic_cast<FloatNode*>(children.front()) || dynamic_cast<FloatNode*>(children.back())){
+		std::cout << "Floats are currently not supported" << std::endl;
+		exit(-1);
+	}
+	TypeNode& op1 = *((TypeNode*)children.front());
+	TypeNode& op2 = *((TypeNode*)children.back());
+	std::stringstream ss;
+	ss << "    ";
+	ss << "movq ";
+  	ss << "$" << op1.value;
+	ss << ",";
+	ss << "%rax";
+	ss << std::endl;
+	
+	ss << "    ";
+	ss << "movq ";
+  	ss << "$" << op2.value;
+	ss << ",";
+	ss << "%rbx";
+	ss << std::endl;
+	
+	ss << "    ";
+	ss << "subq ";
+  	ss << "%rbx" << "," << "%rax";
+	ss << std::endl;
 	return ss.str();
 }

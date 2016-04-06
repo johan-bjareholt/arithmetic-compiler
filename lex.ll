@@ -17,6 +17,8 @@
 
 [0-9]+\.[0-9]+		{ log("float", yytext); return yy::parser::make_floatnum(yytext); }
 [0-9]+				{ log("int", yytext); return yy::parser::make_intnum(yytext); }
+\+					{ log("plus",yytext); return yy::parser::make_plus(yytext); }
+-					{ log("minus",yytext); return yy::parser::make_minus(yytext); }
 
 <<EOF>>				{ log("end",""); return yy::parser::make_QUIT(); }
 
