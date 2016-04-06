@@ -22,7 +22,7 @@
 
 %%
 
-void set_input_file(char* filename){
+void set_input_file(const char* filename){
 	yyin = fopen(filename, "r");
 }
 
