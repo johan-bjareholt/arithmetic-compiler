@@ -28,6 +28,23 @@ class TypeNode : public Node {
 	void dumps_str(std::stringstream& ss, int depth);
 };
 
+
+class FunccallNode : public TypeNode {
+	public:
+	std::string name;
+	
+	FunccallNode(std::string name);
+	std::string to_str();
+	std::string to_asm();
+};
+
+
+class VariableNode : public TypeNode {
+	public:
+	VariableNode(std::string value);
+	std::string to_str();
+};
+
 class IntNode : public TypeNode {
 	public:
 	IntNode(std::string value);

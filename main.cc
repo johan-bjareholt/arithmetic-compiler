@@ -51,6 +51,9 @@ int main(int argc, char** argv){
 		else if (dynamic_cast<OperatorNode*>(child) != nullptr){
 			bodystream << ((OperatorNode*)child)->to_asm() << std::endl;
 		}
+		else if (dynamic_cast<FunccallNode*>(child) != nullptr){
+			bodystream << ((FunccallNode*)child)->to_asm() << std::endl;
+		}
 	}
 
 	// Data
@@ -67,10 +70,10 @@ int main(int argc, char** argv){
 	// Main function
 	of << ".global main" << std::endl;
 	of << "main:" << std::endl;
-	of << "    subq    $8,%rsp" << std::endl; // Fix stack alignment
+	of << "    subq $8,%rsp" << std::endl; // Fix stack alignment
 	// Print compiler info
-	of << "    movq    $_CompilerInfoStr,%rdi" << std::endl; // Set output string as arg1
-	of << "    call    puts" << std::endl; // Call puts
+	of << "    movq $_CompilerInfoStr,%rdi" << std::endl; // Set output string as arg1
+	of << "    call prints" << std::endl; // Call puts
 	of << std::endl;
 	// Insert code
 	of << bodystream.str();

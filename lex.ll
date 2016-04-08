@@ -15,10 +15,14 @@
 
 %%
 
-[0-9]+\.[0-9]+		{ log("float", yytext); return yy::parser::make_floatnum(yytext); }
-[0-9]+				{ log("int", yytext); return yy::parser::make_intnum(yytext); }
-\+					{ log("plus",yytext); return yy::parser::make_plus(yytext); }
--					{ log("minus",yytext); return yy::parser::make_minus(yytext); }
+[0-9]+\.[0-9]+			{ log("float", yytext); return yy::parser::make_FLOAT(yytext); }
+[0-9]+					{ log("int", yytext); return yy::parser::make_INT(yytext); }
+\+						{ log("plus",yytext); return yy::parser::make_PLUS(yytext); }
+-						{ log("minus",yytext); return yy::parser::make_MINUS(yytext); }	
+
+[A-Za-z][A-Za-z0-9\-_]*	{ log("varname", yytext); return yy::parser::make_VARNAME(yytext); }
+\(						{ log("parleft", yytext); return yy::parser::make_PAR_LEFT(yytext); }
+\)						{ log("parright", yytext); return yy::parser::make_PAR_RIGHT(yytext); }
 
 <<EOF>>				{ log("end",""); return yy::parser::make_QUIT(); }
 

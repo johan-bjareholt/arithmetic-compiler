@@ -47,6 +47,45 @@ std::string ContainerNode::to_str(){
 	return ss.str();
 }
 
+FunccallNode::FunccallNode(std::string name){
+	this->name = name;
+}
+
+std::string FunccallNode::to_str(){
+	std::stringstream ss;
+	ss << "funccall: " << name;
+	return ss.str();
+}
+
+std::string FunccallNode::to_asm(){
+	std::stringstream ss;
+	if (this->name == "printi"){
+		ss << "    movq %rax, %rdi" << std::endl;
+		ss << "    call printi" << std::endl;
+	}
+	else if (this->name == "prints"){
+		ss << "    movq %rax, %rdi" << std::endl;
+		ss << "    call prints" << std::endl;
+	}
+	else {
+		std::cout << "Function " << this->name << " is not defined" << std::endl;
+		exit(-1);
+	}
+	ss << std::endl;
+	return ss.str();
+}
+
+VariableNode::VariableNode(std::string value){
+	this->value = value;
+	this->srcline = linenr;
+}
+
+std::string VariableNode::to_str(){
+	std::stringstream ss;
+	ss << "var: " << value;
+	return ss.str();
+}
+
 IntNode::IntNode(std::string value){
 	this->value = value;
 	this->srcline = linenr;
@@ -105,6 +144,7 @@ std::string PlusNode::to_asm(){
 	ss << "addq ";
   	ss << "%rbx" << "," << "%rax";
 	ss << std::endl;
+	ss << std::endl;
 	return ss.str();
 }
 
@@ -143,6 +183,7 @@ std::string MinusNode::to_asm(){
 	ss << "    ";
 	ss << "subq ";
   	ss << "%rbx" << "," << "%rax";
+	ss << std::endl;
 	ss << std::endl;
 	return ss.str();
 }

@@ -19,17 +19,24 @@
 %type <Node*> exp
 %type <TypeNode*> value
 %type <OperatorNode*> binop
+%type <VariableNode*> varname
+%type <FunccallNode*> funccall
 
 
 
 
  /* Operators */
-%token <std::string> plus
-%token <std::string> minus
+%token <std::string> PLUS
+%token <std::string> MINUS
 
  /* Types */
-%token <std::string> intnum
-%token <std::string> floatnum
+%token <std::string> INT
+%token <std::string> FLOAT
+
+ /* Misc */
+%token <std::string> VARNAME
+%token <std::string> PAR_LEFT
+%token <std::string> PAR_RIGHT
 
 %token QUIT 0 "end of file"
 
@@ -60,24 +67,37 @@ exp		: exp binop exp
 	 	{
 			$$ = $1;
 		}
+		| funccall
+		{
+			$$ = $1;
+		}
 		;
 
-value	: intnum
+value	: INT
 	 	{
 			$$ = new IntNode($1);
 	 	}
-		| floatnum
+		| FLOAT
 		{
 			$$ = new FloatNode($1);
 		}
 		;
 
-binop	: plus
+binop	: PLUS
 	  	{
 			$$ = new PlusNode();
 		}
-		| minus
+		| MINUS
 		{
 			$$ = new MinusNode();
 		}
 		;
+
+funccall: varname PAR_LEFT PAR_RIGHT {
+			$$ = new FunccallNode($1->value);
+			delete $1;
+		}
+
+varname	: VARNAME {
+			$$ = new VariableNode($1);
+		}
