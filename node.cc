@@ -7,47 +7,65 @@
 #include <list>
 #include <typeinfo>
 
-void ContainerNode::dumps_str(std::stringstream& ss, int depth) {
-   	for(int i=0; i<depth+1; i++)
-       	ss << " ";
-   	ss << "Container" << std::endl;
-    for(std::list<Node*>::iterator i=children.begin(); i!=children.end(); i++){
-		(*i)->dumps_str(ss, depth+1);
-	}
+
+/*
+
+	Baseclass
+
+*/
+
+Node::Node(){
+	this->srcline = linenr;
 }
 
-void OperatorNode::dumps_str(std::stringstream& ss, int depth) {
-   	for(int i=0; i<depth+1; i++)
+void Node::writeline(std::stringstream& ss, int depth){
+	std::string linestr = std::to_string(srcline);
+	ss << linestr;
+	for (int i=linestr.length(); i<=3; i++)
+		ss << " ";
+	ss << ":";
+    for(int i=0; i<depth; i++)
        	ss << " ";
    	ss << to_str() << std::endl;
+}
+
+
+
+/*
+
+	Containers 
+ 
+*/
+
+ContainerNode::ContainerNode() : Node(){}
+
+void ContainerNode::dumps_str(std::stringstream& ss, int depth) {
+	writeline(ss, depth);
     for(std::list<Node*>::iterator i=children.begin(); i!=children.end(); i++){
 		(*i)->dumps_str(ss, depth+1);
 	}
 }
 
+
+RootblockNode::RootblockNode() : ContainerNode(){}
+
+std::string RootblockNode::to_str(){
+	return "rootblock";
+}
+
+/*
+
+   Types
+ 
+*/
+
+TypeNode::TypeNode() : Node() {}
+
 void TypeNode::dumps_str(std::stringstream& ss, int depth){
-    for(int i=0; i<depth+1; i++)
-       	ss << " ";
-	ss << to_str() << std::endl;
+	writeline(ss, depth);
 }
 
-
-ContainerNode::ContainerNode(){
-	this->srcline = linenr;
-}
-
-ContainerNode::ContainerNode(std::string tag){
-	this->tag = tag;
-	this->srcline = linenr;
-}
-
-std::string ContainerNode::to_str(){
-	std::stringstream ss;
-	ss << "container: " << tag;
-	return ss.str();
-}
-
-FunccallNode::FunccallNode(std::string name){
+FunccallNode::FunccallNode(std::string name) : TypeNode() {
 	this->name = name;
 }
 
@@ -75,9 +93,8 @@ std::string FunccallNode::to_asm(){
 	return ss.str();
 }
 
-VariableNode::VariableNode(std::string value){
+VariableNode::VariableNode(std::string value) : TypeNode() {
 	this->value = value;
-	this->srcline = linenr;
 }
 
 std::string VariableNode::to_str(){
@@ -86,7 +103,7 @@ std::string VariableNode::to_str(){
 	return ss.str();
 }
 
-IntNode::IntNode(std::string value){
+IntNode::IntNode(std::string value) : TypeNode() {
 	this->value = value;
 	this->srcline = linenr;
 }
@@ -97,7 +114,7 @@ std::string IntNode::to_str(){
 	return ss.str();
 }
 
-FloatNode::FloatNode(std::string value){
+FloatNode::FloatNode(std::string value) : TypeNode() {
 	this->value = value;
 	this->srcline = linenr;
 }
@@ -108,14 +125,27 @@ std::string FloatNode::to_str(){
 	return ss.str();
 }
 
-PlusNode::PlusNode(){
+/*
+
+	Operators
+
+*/
+
+OperatorNode::OperatorNode() : Node() {}
+
+void OperatorNode::dumps_str(std::stringstream& ss, int depth) {
+	writeline(ss, depth);
+    for(std::list<Node*>::iterator i=children.begin(); i!=children.end(); i++){
+		(*i)->dumps_str(ss, depth+1);
+	}
+}
+
+PlusNode::PlusNode() : OperatorNode() {
 	this->srcline = linenr;
 }
 
 std::string PlusNode::to_str(){
-	std::stringstream ss;
-	ss << "plus: ";
-	return ss.str();
+	return "plus";
 }
 
 std::string PlusNode::to_asm(){
@@ -148,14 +178,12 @@ std::string PlusNode::to_asm(){
 	return ss.str();
 }
 
-MinusNode::MinusNode(){
+MinusNode::MinusNode() : OperatorNode() {
 	this->srcline = linenr;
 }
 
 std::string MinusNode::to_str(){
-	std::stringstream ss;
-	ss << "minus: ";
-	return ss.str();
+	return "minus";
 }
 
 std::string MinusNode::to_asm(){

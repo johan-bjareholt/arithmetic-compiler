@@ -3,28 +3,54 @@
 #include <sstream>
 #include <list>
 
+/*
+
+	Baseclass
+
+*/
+
 class Node {
     public:
+	Node();
 	int srcline;
+	void writeline(std::stringstream& ss, int depth);
 	virtual std::string to_str() = 0;
 	virtual void dumps_str(std::stringstream& ss, int depth) = 0;
 };
 
+
+/*
+
+	Containers
+
+*/
 
 class ContainerNode : public Node {
 	public:
 	std::string tag;
     std::list<Node*> children;
 	ContainerNode();
-    ContainerNode(std::string tag);
-	std::string to_str();
+	virtual std::string to_str() = 0;
     void dumps_str(std::stringstream& ss, int depth=0);
 };
+
+class RootblockNode : public ContainerNode {
+	public:
+	RootblockNode();
+	std::string to_str();
+};
+
+/*
+
+	Types
+
+*/
 
 class TypeNode : public Node {
 	public:
 	std::string value;
-	
+
+	TypeNode();	
 	void dumps_str(std::stringstream& ss, int depth);
 };
 
@@ -58,10 +84,18 @@ class FloatNode : public TypeNode {
 };
 
 
+/*
+
+  Operators 
+ 
+*/
+
+
 class OperatorNode : public Node {
 	public:
 	std::list<Node*> children;
-	
+
+	OperatorNode();	
 	std::string to_str() = 0;
     void dumps_str(std::stringstream& ss, int depth=0);
 	virtual std::string to_asm() = 0;
@@ -87,6 +121,5 @@ class MinusNode : public OperatorNode {
  
 Assignments (type, operands)
 	- Right to left simplifies the implementation
-Containers
 
 */

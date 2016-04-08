@@ -21,7 +21,7 @@
 %type <OperatorNode*> binop
 %type <VariableNode*> varname
 %type <FunccallNode*> funccall
-
+%type <Node*> command
 
 
 
@@ -38,22 +38,28 @@
 %token <std::string> PAR_LEFT
 %token <std::string> PAR_RIGHT
 
+%token NEWLINE
 %token QUIT 0 "end of file"
 
 %%
 
 
-block	: exp
+block	: command
 	  	{
-			$$ = new ContainerNode("block");
+			$$ = new RootblockNode();
 			$$->children.push_back((Node*)$1);
 			root = $$;
 		}
-		| block exp
+		| block command
 		{
 			$$ = $1;
 			$$->children.push_back((Node*)$2);
 			root = $$;
+		}
+		;
+
+command : exp NEWLINE {
+			$$ = $1;
 		}
 		;
 

@@ -3,7 +3,7 @@
 	#include "globals.h"
     #define YY_DECL yy::parser::symbol_type yylex()
 
-	int linenr = 0;
+	int linenr = 1;
 
 	void log(std::string message, std::string text){
 		if (debug_lex == true)
@@ -24,7 +24,8 @@
 \(						{ log("parleft", yytext); return yy::parser::make_PAR_LEFT(yytext); }
 \)						{ log("parright", yytext); return yy::parser::make_PAR_RIGHT(yytext); }
 
-<<EOF>>				{ log("end",""); return yy::parser::make_QUIT(); }
+\n						{ log("newline",""); linenr++; return yy::parser::make_NEWLINE(); }
+<<EOF>>					{ log("end",""); return yy::parser::make_QUIT(); }
 
 %%
 
