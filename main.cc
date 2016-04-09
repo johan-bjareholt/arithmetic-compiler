@@ -7,7 +7,8 @@
 #include "grammar.tab.hh"
 
 #include "globals.h"
-
+#include "vartable.h"
+#include "node.h"
 
 bool debug_lex = true;
 bool debug_cfg = true;
@@ -79,7 +80,6 @@ int main(int argc, char** argv){
 	of << bodystream.str();
 	// Exit
 	of << "    call exit" << std::endl;
-
     return 0;
 }
 

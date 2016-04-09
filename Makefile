@@ -1,7 +1,7 @@
 NAME=compiler
 CPPFLAGS=-g --std=c++11
 
-SRC=main.cc node.cc
+SRC=main.cc node.cc vartable.cc
 
 # Link & compile
 parser: lex.yy.c grammar.tab.o
