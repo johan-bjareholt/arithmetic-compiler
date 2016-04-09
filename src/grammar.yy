@@ -12,7 +12,7 @@
 
     YY_DECL;
 
-    ContainerNode* root;
+    RootblockNode* root;
 }
 
 %type <ContainerNode*> block
@@ -48,13 +48,13 @@ block	: command
 	  	{
 			$$ = new RootblockNode();
 			$$->children.push_back((Node*)$1);
-			root = $$;
+			root = (RootblockNode*) $$;
 		}
 		| block command
 		{
 			$$ = $1;
 			$$->children.push_back((Node*)$2);
-			root = $$;
+			root = (RootblockNode*) $$;
 		}
 		;
 

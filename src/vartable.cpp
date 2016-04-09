@@ -1,8 +1,8 @@
-#include <iostream>
-#include <utility>
-
 #include "globals.h"
 #include "vartable.h"
+
+#include <string>
+
 
 VarTable::VarTable(){
 	this->parenttable = nullptr;
@@ -17,15 +17,19 @@ VarTable::~VarTable(){
 }
 
 void VarTable::addvar(const std::string name, TypeNode& value){
+	// TODO: Copy over TypeNode so VarTable can have ownership and take care of cleanup.
 	std::pair<std::string,TypeNode*> entry (name.c_str(), &value);
 	table.insert(entry);
 }
 
 bool VarTable::setvar(const std::string name, TypeNode& value){
-	
+	// TODO: Not a very good solution
+	delvar(name);
+	addvar(name, value);
 }
 
 bool VarTable::delvar(const std::string name){
+	table.erase(name);
 }
 
 std::pair<const std::string, TypeNode*>* VarTable::getentry(const std::string name){

@@ -10,9 +10,6 @@
 #include "vartable.h"
 #include "node.h"
 
-bool debug_lex = true;
-bool debug_cfg = true;
-
 void yy::parser::error(const std::string& err){
     std::cout << "It's one of the bad ones... " << err << std::endl;
     exit(-1);
@@ -20,6 +17,9 @@ void yy::parser::error(const std::string& err){
 
 void setup();
 void parse_args(int argc, char** argv);
+
+bool debug_lex = true;
+bool debug_cfg = true;
 
 std::string inputfile = "";
 std::string outputfile = "program.s";

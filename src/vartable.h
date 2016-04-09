@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 
+
 class VarTable {
 	private:
 	std::unordered_map<std::string, TypeNode*> table;

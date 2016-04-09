@@ -3,6 +3,9 @@
 #include <sstream>
 #include <list>
 
+#include "globals.h"
+
+
 /*
 
 	Baseclass
