@@ -1,22 +1,38 @@
+CXX=g++
 NAME=compiler
 CPPFLAGS=-g --std=c++11
+INCLUDES=-Isrc/ -Ibuild/
+FLAGS=$(CPPFLAGS) $(INCLUDES)
 
-SRC=main.cc node.cc vartable.cc
+MAINCPP=src/main.cpp
+OBJ=build/node.o build/vartable.o \
+	build/grammar.tab.o \
+	build/lex.yy.c
 
 # Link & compile
-parser: lex.yy.c grammar.tab.o
-	g++ $(CPPFLAGS) -o $(NAME) $(SRC) grammar.tab.o lex.yy.c
+.PHONY: $(NAME)
+$(NAME): $(OBJ)
+	$(CXX) $(FLAGS) -o $(NAME) $(MAINCPP) $(OBJ)
+
+#	Compiles source files
+build/%.o: src/%.cpp build/
+	$(CXX) -c $(FLAGS) -o $@ $<
 
 # Grammar
-grammar.tab.o: grammar.tab.cc
-	g++ $(CPPFLAGS) -c grammar.tab.cc
-grammar.tab.cc: grammar.yy
-	bison grammar.yy
+build/grammar.tab.o: build/grammar.tab.cc build/
+	$(CXX) $(FLAGS) -o build/grammar.tab.o -c build/grammar.tab.cc
+build/grammar.tab.cc: src/grammar.yy build/
+	bison -o build/grammar.tab.cc src/grammar.yy
+
 
 # Lexing
-lex.yy.c: lex.ll grammar.tab.cc
-	flex lex.ll
+build/lex.yy.c: src/lex.ll build/grammar.tab.cc build/
+	flex -o build/lex.yy.c -c src/lex.ll
+
+# Create build folder
+build/:
+	mkdir -p build
 
 # Clean
 clean:
-	rm $(NAME) grammar.tab.* lex.yy.c* stack.hh
+	rm -r build $(NAME)
