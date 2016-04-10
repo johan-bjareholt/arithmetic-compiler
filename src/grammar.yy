@@ -19,24 +19,29 @@
 %type <Node*> exp
 %type <TypeNode*> value
 %type <OperatorNode*> binop
-%type <VariableNode*> varname
+%type <ReferenceNode*> reference
+%type <ArglistNode*> arglist
 %type <FunccallNode*> funccall
 %type <Node*> command
 
 
 
  /* Operators */
-%token <std::string> PLUS
-%token <std::string> MINUS
+%token PLUS
+%token MINUS
+%token EQUALS
 
  /* Types */
 %token <std::string> INT
 %token <std::string> FLOAT
 
- /* Misc */
+ /* Variable handling */
 %token <std::string> VARNAME
-%token <std::string> PAR_LEFT
-%token <std::string> PAR_RIGHT
+
+/* Misc */
+%token PAR_LEFT
+%token PAR_RIGHT
+%token COMMA
 
 %token NEWLINE
 %token QUIT 0 "end of file"
@@ -61,6 +66,9 @@ block	: command
 command : exp NEWLINE {
 			$$ = $1;
 		}
+		| VARNAME EQUALS exp NEWLINE {
+			$$ = new AssignmentNode($1, *$3);
+		}
 		;
 
 exp		: exp binop exp
@@ -77,7 +85,23 @@ exp		: exp binop exp
 		{
 			$$ = $1;
 		}
+		| reference
+		{
+			$$ = $1;
+		}
 		;
+
+arglist	: /* empty */ {
+			$$ = new ArglistNode();
+		}
+		| exp {
+			$$ = new ArglistNode();
+			$$->children.push_back($1);
+		}
+		| arglist COMMA exp {
+			$$ = $1;
+			$$->children.push_back($3);
+		}
 
 value	: INT
 	 	{
@@ -85,7 +109,9 @@ value	: INT
 	 	}
 		| FLOAT
 		{
-			$$ = new FloatNode($1);
+			std::cout << "Floats are not supported yet" << std::endl;
+			exit(-1);
+			//$$ = new FloatNode($1);
 		}
 		;
 
@@ -99,11 +125,10 @@ binop	: PLUS
 		}
 		;
 
-funccall: varname PAR_LEFT PAR_RIGHT {
-			$$ = new FunccallNode($1->value);
-			delete $1;
+funccall: VARNAME PAR_LEFT arglist PAR_RIGHT {
+			$$ = new FunccallNode($1, $3);
 		}
 
-varname	: VARNAME {
-			$$ = new VariableNode($1);
+reference: VARNAME {
+			$$ = new ReferenceNode($1);
 		}

@@ -24,6 +24,8 @@ bool debug_cfg = true;
 std::string inputfile = "";
 std::string outputfile = "program.s";
 
+VarTable roottable;
+
 int main(int argc, char** argv){
 	parse_args(argc, argv);
 	setup();
@@ -45,24 +47,36 @@ int main(int argc, char** argv){
 
 	// Convert sequential to assembly
 	ContainerNode* cn = root;
-	std::stringstream bodystream;
+	cn.push_back()
+	std::stringstream codestream;
 	for (std::list<Node*>::iterator i = cn->children.begin(); i != cn->children.end(); i++){
 		Node* child = *i;
 		if (typeid(child) == typeid(TypeNode*)){}
 		else if (dynamic_cast<OperatorNode*>(child) != nullptr){
-			bodystream << ((OperatorNode*)child)->to_asm() << std::endl;
+			codestream << ((OperatorNode*)child)->to_asm();
 		}
 		else if (dynamic_cast<FunccallNode*>(child) != nullptr){
-			bodystream << ((FunccallNode*)child)->to_asm() << std::endl;
+			codestream << ((FunccallNode*)child)->to_asm();
 		}
+		else if (dynamic_cast<AssignmentNode*>(child) != nullptr){
+			codestream << ((AssignmentNode*)child)->to_asm();
+		}
+		codestream << std::endl;
+	}
+
+
+	// Get all global variables
+	std::stringstream datastream;
+	datastream << "_CompilerInfoStr: .asciz \"arithmetic-compiler v0.1 alpha\"" << std::endl;
+	for (std::pair<std::string, DataNode*> entry : roottable.table){
+		std::cout << entry.first << std::endl;
+		datastream << "_" << entry.first << ": .space "<< entry.second->bsize << std::endl;
 	}
 
 	// Data
 	of << ".data" << std::endl;
 	of << std::endl;
-	of << "_CompilerInfoStr: .asciz \"arithmetic-compiler v0.1 alpha\"" << std::endl;
-
-	of << std::endl;
+	of << datastream.str();
 	of << std::endl;
 	of << std::endl;
 	// Text
@@ -77,7 +91,7 @@ int main(int argc, char** argv){
 	of << "    call prints" << std::endl; // Call puts
 	of << std::endl;
 	// Insert code
-	of << bodystream.str();
+	of << codestream.str();
 	// Exit
 	of << "    call exit" << std::endl;
     return 0;
@@ -92,7 +106,6 @@ void setup(){
 		inputfile = "stdin";
 	std::cout << "Input: " << inputfile << std::endl;
 	std::cout << "Output: " << outputfile << std::endl;
-
 }
 
 

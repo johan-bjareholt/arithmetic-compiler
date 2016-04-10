@@ -8,4 +8,6 @@ extern int linenr;
 class RootblockNode;
 extern RootblockNode* root;
 
+class VarTable;
+extern VarTable roottable;
 

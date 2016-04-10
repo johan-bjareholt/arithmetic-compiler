@@ -18,6 +18,7 @@ class Node {
 	int srcline;
 	void writeline(std::stringstream& ss, int depth);
 	virtual std::string to_str() = 0;
+	virtual std::string to_asm() = 0;
 	virtual void dumps_str(std::stringstream& ss, int depth) = 0;
 };
 
@@ -33,7 +34,6 @@ class ContainerNode : public Node {
 	std::string tag;
     std::list<Node*> children;
 	ContainerNode();
-	virtual std::string to_str() = 0;
     void dumps_str(std::stringstream& ss, int depth=0);
 };
 
@@ -41,6 +41,25 @@ class RootblockNode : public ContainerNode {
 	public:
 	RootblockNode();
 	std::string to_str();
+	std::string to_asm();
+};
+
+class ArglistNode : public ContainerNode {
+	public:
+	ArglistNode();
+	std::string to_str();
+	std::string to_asm();
+};
+
+class AssignmentNode : public Node {
+	public:
+	std::string name;
+	Node* value;
+
+	AssignmentNode(std::string, Node&);
+	void dumps_str(std::stringstream& ss, int depth);
+	std::string to_str();
+	std::string to_asm();
 };
 
 /*
@@ -52,38 +71,49 @@ class RootblockNode : public ContainerNode {
 class TypeNode : public Node {
 	public:
 	std::string value;
-
 	TypeNode();	
-	void dumps_str(std::stringstream& ss, int depth);
+	virtual void dumps_str(std::stringstream& ss, int depth);
 };
 
 
 class FunccallNode : public TypeNode {
 	public:
 	std::string name;
-	
-	FunccallNode(std::string name);
+	ArglistNode* args = nullptr;
+
+	FunccallNode(std::string name, ArglistNode* args);
+	void dumps_str(std::stringstream& ss, int depth);
 	std::string to_str();
 	std::string to_asm();
 };
 
 
-class VariableNode : public TypeNode {
+class ReferenceNode : public TypeNode {
 	public:
-	VariableNode(std::string value);
+	ReferenceNode(std::string value);
 	std::string to_str();
+	std::string to_asm();
 };
 
-class IntNode : public TypeNode {
+class DataNode : public TypeNode {
+	public:
+	int bsize;
+
+	DataNode(int bsize);
+};
+
+class IntNode : public DataNode {
 	public:
 	IntNode(std::string value);
 	std::string to_str();
+	std::string to_asm();
 };
 
-class FloatNode : public TypeNode {
+class FloatNode : public DataNode {
 	public:
 	FloatNode(std::string value);
 	std::string to_str();
+	std::string to_asm() = 0;
 };
 
 
@@ -94,13 +124,10 @@ class FloatNode : public TypeNode {
 */
 
 
-class OperatorNode : public Node {
+class OperatorNode : public ContainerNode {
 	public:
-	std::list<Node*> children;
-
 	OperatorNode();	
 	std::string to_str() = 0;
-    void dumps_str(std::stringstream& ss, int depth=0);
 	virtual std::string to_asm() = 0;
 };
 

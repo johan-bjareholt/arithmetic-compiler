@@ -26,6 +26,8 @@ function itest() {
 	fi
 }
 
-itest "tests/basic.src"
+itest "tests/arithmetic.src"
+itest "tests/variables.src"
+itest "tests/funccall.src"
 
 printf "%d/%d tests passed\n" $gtestpass $gtestcount
