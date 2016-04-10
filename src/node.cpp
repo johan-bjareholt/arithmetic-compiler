@@ -55,7 +55,17 @@ std::string RootblockNode::to_str(){
 }
 
 std::string RootblockNode::to_asm(){
-	return "";
+	std::stringstream ss;
+	// Print compiler info
+	ss << "    movq $_CompilerInfoStr, %rdi" << std::endl; 
+	ss << "    call prints" << std::endl;
+	ss << std::endl;
+
+	for (Node* node : children){
+		ss << node->to_asm();
+		ss << std::endl;
+	}
+	return ss.str();
 }
 
 ArglistNode::ArglistNode() : ContainerNode(){}
