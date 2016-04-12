@@ -5,7 +5,7 @@ INCLUDES=-Isrc/ -Ibuild/
 FLAGS=$(CPPFLAGS) $(INCLUDES)
 
 MAINCPP=src/main.cpp
-OBJ=build/node.o build/vartable.o \
+OBJ=build/nodes.o build/vartable.o build/classes.o \
 	build/grammar.tab.o \
 	build/lex.yy.c
 

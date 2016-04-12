@@ -1,4 +1,4 @@
-#include "node.h"
+#include "nodes.h"
 #include "globals.h"
 #include "vartable.h"
 
@@ -90,7 +90,29 @@ std::string ArglistNode::to_asm(){
 
 AssignmentNode::AssignmentNode(std::string name, Node& exp) : Node() {
 	this->name = name;
-	roottable.addvar(name, *(DataNode*)&exp);
+	std::cout << name << std::endl;
+	std::cout << exp.to_str() << std::endl;
+	DataNode* dn = dynamic_cast<DataNode*>(&exp);
+	OperatorNode* on = dynamic_cast<OperatorNode*>(&exp);
+	if (dn != nullptr){
+		if (dynamic_cast<IntNode*>(dn)){
+			roottable.addvar(name, *(new IntClass()));
+		}
+		else {
+			std::cout << "This datanode type is not yet supported for assignment" << std::endl;
+			exit(-1);
+		}
+	}
+	else if (on != nullptr){
+		// TODO: Operator assignments only support ints, not floats
+		roottable.addvar(name, *(new IntClass()));
+	}
+	else {
+		std::cout << "Cannot assign this type to a variable!" << std::endl;
+		exit(-1);
+	}
+
+
 	value = &exp;
 }
 

@@ -8,7 +8,8 @@
 
 #include "globals.h"
 #include "vartable.h"
-#include "node.h"
+#include "nodes.h"
+#include "classes.h"
 
 void yy::parser::error(const std::string& err){
     std::cout << "It's one of the bad ones... " << err << std::endl;
@@ -51,8 +52,9 @@ int main(int argc, char** argv){
 	// Get all global variables
 	std::stringstream datastream;
 	datastream << "_CompilerInfoStr: .asciz \"arithmetic-compiler v0.1 alpha\"" << std::endl;
-	for (std::pair<std::string, DataNode*> entry : roottable.table){
-		datastream << "_" << entry.first << ": .space "<< entry.second->bsize << std::endl;
+	for (std::pair<std::string, Class*> entry : roottable.table){
+		Class* object = entry.second;
+		datastream << "_" << entry.first << ": .space "<< object->bytesize << std::endl;
 	}
 
 	// Data section

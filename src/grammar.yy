@@ -4,7 +4,7 @@
 %define api.token.constructor
 %code requires{
 	#include "globals.h"
-	#include "node.h"
+	#include "nodes.h"
 }
 %code{
     #include <string>
