@@ -1,5 +1,7 @@
 #pragma once
 
+#include "variable.h"
+
 #include <string>
 
 enum Classes {
@@ -8,15 +10,21 @@ enum Classes {
 	CLASS_STR,
 };
 
-class Class {
+class Class : public Variable {
 	public:
 	int bytesize;
 	Class(int bytesize);
-	virtual std::string to_string() = 0;
+	virtual std::string to_str() = 0;
 };
 
 class IntClass : public Class {
 	public:
 	IntClass();
-	virtual std::string to_string();
+	virtual std::string to_str();
+};
+
+class FuncClass : public Class {
+	public:
+	FuncClass();
+	virtual std::string to_str();
 };

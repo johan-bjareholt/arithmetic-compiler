@@ -37,9 +37,9 @@ class ContainerNode : public Node {
     void dumps_str(std::stringstream& ss, int depth=0);
 };
 
-class RootblockNode : public ContainerNode {
+class BlockNode : public ContainerNode {
 	public:
-	RootblockNode();
+	BlockNode();
 	std::string to_str();
 	std::string to_asm();
 };
@@ -51,16 +51,22 @@ class ArglistNode : public ContainerNode {
 	std::string to_asm();
 };
 
-class AssignmentNode : public Node {
-	public:
-	std::string name;
-	Node* value;
+/*
+   Funcdef
+*/
 
-	AssignmentNode(std::string, Node&);
-	void dumps_str(std::stringstream& ss, int depth);
+class FuncdefNode : public Node {
+	public:
+	// type
+	ArglistNode* args = nullptr;
+	BlockNode* codeblock = nullptr;
+	FuncdefNode(std::string name, ArglistNode* args, BlockNode* codeblock);
 	std::string to_str();
 	std::string to_asm();
+	void dumps_str(std::stringstream& ss, int depth);
 };
+
+
 
 /*
 
@@ -86,6 +92,7 @@ class FunccallNode : public TypeNode {
 	std::string to_str();
 	std::string to_asm();
 };
+
 
 
 class ReferenceNode : public TypeNode {
@@ -149,7 +156,19 @@ class MinusNode : public OperatorNode {
 
 /*
  
-Assignments (type, operands)
-	- Right to left simplifies the implementation
+	Assignment
 
 */
+
+class AssignmentNode : public Node {
+	public:
+	std::string name;
+	Node* value;
+
+	AssignmentNode(std::string, Node&);
+	void dumps_str(std::stringstream& ss, int depth);
+	std::string to_str();
+	std::string to_asm();
+};
+
+

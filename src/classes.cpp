@@ -6,6 +6,6 @@ Class::Class(int bytesize){
 
 IntClass::IntClass() : Class(8) {}
 
-std::string IntClass::to_string(){
+std::string IntClass::to_str(){
 	return "int";
 }

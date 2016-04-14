@@ -8,6 +8,8 @@
 
 #include "globals.h"
 #include "vartable.h"
+#include "variable.h"
+#include "func.h"
 #include "nodes.h"
 #include "classes.h"
 
@@ -47,14 +49,27 @@ int main(int argc, char** argv){
 	std::ofstream of (outputfile, std::ofstream::out);
 
 	// Convert sequential to assembly
-	RootblockNode* rb = root;
+	BlockNode* rb = root;
 
 	// Get all global variables
 	std::stringstream datastream;
+	std::stringstream funcdefstream;
 	datastream << "_CompilerInfoStr: .asciz \"arithmetic-compiler v0.1 alpha\"" << std::endl;
-	for (std::pair<std::string, Class*> entry : roottable.table){
-		Class* object = entry.second;
-		datastream << "_" << entry.first << ": .space "<< object->bytesize << std::endl;
+	for (std::pair<std::string, Variable*> entry : roottable.table){
+		std::string& varname = entry.first;
+		if (dynamic_cast<Class*>(entry.second)){
+			Class* object = (Class*) entry.second;
+			datastream << "_" << varname << ": .space "<< object->bytesize << std::endl;
+		}
+		else if (dynamic_cast<Function*>(entry.second)){
+			Function* funcdef = (Function*) entry.second;
+			funcdefstream << std::endl;
+			funcdefstream << ".global " << varname << std::endl;
+			funcdefstream << varname << ":" << std::endl;
+			funcdefstream << funcdef->to_asm() << std::endl;
+			funcdefstream << "    ret" << std::endl;
+			funcdefstream << std::endl;
+		}
 	}
 
 	// Data section
@@ -70,8 +85,9 @@ int main(int argc, char** argv){
 	// Main function
 	of << ".global main" << std::endl;
 	of << "main:" << std::endl;
-	// Insert code
-	of << rb->to_asm();
+	of << "    movq $_CompilerInfoStr, %rdi" << std::endl;
+	of << "    call prints" << std::endl << std::endl; // Print compiler info string
+	of << rb->to_asm(); // Insert main function code
 	// Exit
 	of << "    call exit" << std::endl;
     return 0;

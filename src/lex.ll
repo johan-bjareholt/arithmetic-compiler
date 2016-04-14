@@ -25,9 +25,12 @@
 [A-Za-z][A-Za-z0-9\_]*	{ log("varname", yytext); return yy::parser::make_VARNAME(yytext); }
 \(						{ log("parleft", yytext); return yy::parser::make_PAR_LEFT(); }
 \)						{ log("parright", yytext); return yy::parser::make_PAR_RIGHT(); }
+\{						{ log("braceleft", yytext); return yy::parser::make_BRACE_LEFT(); }
+\}						{ log("braceright", yytext); return yy::parser::make_BRACE_RIGHT(); }
 ,						{ log("comma",yytext); return yy::parser::make_COMMA(); }
 
 \n						{ log("newline",""); linenr++; return yy::parser::make_NEWLINE(); }
+;						{ log("semicolon",yytext); return yy::parser::make_SEMICOLON(); }
 <<EOF>>					{ log("end",""); return yy::parser::make_QUIT(); }
 
 %%

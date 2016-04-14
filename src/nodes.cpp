@@ -1,5 +1,6 @@
 #include "nodes.h"
 #include "globals.h"
+#include "func.h"
 #include "vartable.h"
 
 #include <iostream>
@@ -48,19 +49,15 @@ void ContainerNode::dumps_str(std::stringstream& ss, int depth) {
 }
 
 
-RootblockNode::RootblockNode() : ContainerNode(){}
+BlockNode::BlockNode() : ContainerNode(){}
 
-std::string RootblockNode::to_str(){
-	return "rootblock";
+std::string BlockNode::to_str(){
+	return "codeblock";
 }
 
-std::string RootblockNode::to_asm(){
+std::string BlockNode::to_asm(){
 	std::stringstream ss;
 	// Print compiler info
-	ss << "    movq $_CompilerInfoStr, %rdi" << std::endl; 
-	ss << "    call prints" << std::endl;
-	ss << std::endl;
-
 	for (Node* node : children){
 		ss << node->to_asm();
 		ss << std::endl;
@@ -130,6 +127,8 @@ std::string AssignmentNode::to_str(){
 std::string AssignmentNode::to_asm(){
 	std::stringstream ss;
 
+	// TODO: Check if variable is declared before writing asm
+
 	if (dynamic_cast<OperatorNode*>(value) != nullptr){
 		ss << ((OperatorNode*)value)->to_asm();
 	}
@@ -139,6 +138,31 @@ std::string AssignmentNode::to_asm(){
 	ss << std::endl;
 	ss << "    movq %rax, _"<<name<<std::endl;
 	return ss.str();
+}
+
+/*
+   Funcdef
+*/
+
+FuncdefNode::FuncdefNode(std::string name, ArglistNode* args, BlockNode* codeblock){
+	this->args = args;
+	this->codeblock = codeblock;
+
+	roottable.addvar(name, *(new Function(*args, *codeblock)));
+}
+
+std::string FuncdefNode::to_str(){
+	return "funcdef";
+}
+
+std::string FuncdefNode::to_asm(){
+	return "";
+}
+
+void FuncdefNode::dumps_str(std::stringstream& ss, int depth){
+	writeline(ss, depth);
+	args->dumps_str(ss, depth+1);
+	codeblock->dumps_str(ss, depth+1);
 }
 
 /*

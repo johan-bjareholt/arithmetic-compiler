@@ -12,17 +12,19 @@
 
     YY_DECL;
 
-    RootblockNode* root;
+    BlockNode* root;
 }
 
-%type <ContainerNode*> block
+%type <BlockNode*> block
 %type <Node*> exp
 %type <TypeNode*> value
 %type <OperatorNode*> binop
 %type <ReferenceNode*> reference
 %type <ArglistNode*> arglist
+%type <FuncdefNode*> funcdef
 %type <FunccallNode*> funccall
 %type <Node*> command
+%type <void*> cmdend
 
 
 
@@ -41,33 +43,42 @@
 /* Misc */
 %token PAR_LEFT
 %token PAR_RIGHT
+%token BRACE_LEFT
+%token BRACE_RIGHT
 %token COMMA
 
 %token NEWLINE
+%token SEMICOLON
 %token QUIT 0 "end of file"
 
 %%
 
-
 block	: command
 	  	{
-			$$ = new RootblockNode();
+			$$ = new BlockNode();
 			$$->children.push_back((Node*)$1);
-			root = (RootblockNode*) $$;
+			root = (BlockNode*) $$;
 		}
 		| block command
 		{
 			$$ = $1;
 			$$->children.push_back((Node*)$2);
-			root = (RootblockNode*) $$;
+			root = (BlockNode*) $$;
 		}
 		;
 
-command : exp NEWLINE {
+cmdend	: NEWLINE {}
+	   	| SEMICOLON {}
+		;
+
+command : exp cmdend {
 			$$ = $1;
 		}
-		| VARNAME EQUALS exp NEWLINE {
+		| VARNAME EQUALS exp cmdend {
 			$$ = new AssignmentNode($1, *$3);
+		}
+		| funcdef cmdend {
+			$$ = $1;
 		}
 		;
 
@@ -91,14 +102,17 @@ exp		: exp binop exp
 		}
 		;
 
-arglist	: /* empty */ {
+arglist	: /* empty */
+		{
 			$$ = new ArglistNode();
 		}
-		| exp {
+		| exp
+		{
 			$$ = new ArglistNode();
 			$$->children.push_back($1);
 		}
-		| arglist COMMA exp {
+		| arglist COMMA exp
+		{
 			$$ = $1;
 			$$->children.push_back($3);
 		}
@@ -125,10 +139,18 @@ binop	: PLUS
 		}
 		;
 
-funccall: VARNAME PAR_LEFT arglist PAR_RIGHT {
+funcdef	: VARNAME VARNAME PAR_LEFT arglist PAR_RIGHT BRACE_LEFT block BRACE_RIGHT
+		{
+			// TODO: add type returns, do not ignore type varname
+			$$ = new FuncdefNode($2, $4, $7);
+		}
+
+funccall: VARNAME PAR_LEFT arglist PAR_RIGHT
+		{
 			$$ = new FunccallNode($1, $3);
 		}
 
-reference: VARNAME {
+reference: VARNAME 
+		{
 			$$ = new ReferenceNode($1);
 		}
