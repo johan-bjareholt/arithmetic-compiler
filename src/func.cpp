@@ -15,5 +15,7 @@ std::string Function::to_str(){
 
 std::string Function::to_asm(){
 	std::cout << "WARNING: Function to_asm is not yet properly implemented!" << std::endl;
-	return "";
+	std::stringstream ss;
+	ss << funcbody->to_asm();
+	return ss.str();
 }

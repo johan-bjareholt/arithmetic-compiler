@@ -82,6 +82,8 @@ int main(int argc, char** argv){
 	// Text section
 	of << ".text" << std::endl;
 	of << std::endl;
+	of << funcdefstream.str();
+	of << std::endl;
 	// Main function
 	of << ".global main" << std::endl;
 	of << "main:" << std::endl;

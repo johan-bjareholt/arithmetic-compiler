@@ -74,13 +74,12 @@ std::string ArglistNode::to_asm(){
 	std::stringstream ss;
 	for (Node* arg : children){
 		ss << arg->to_asm() << std::endl;
-		ss << "    decq %rsp" << std::endl;
-		ss << "    movq %rax,(%rsp)" << std::endl;
+		ss << "    pushq %rax" << std::endl;
 	}
 	const std::string argregs[] = {"%rdi","%rsi","rdx","rcx","r8","r9"};
 	for(int i=0; i<children.size(); i++){
 		ss << "    movq (%rsp)," << argregs[i] << std::endl;
-		ss << "    incq %rsp" << std::endl;
+		ss << "    popq %rax"  << std::endl;
 	}
 	return ss.str();
 }
@@ -220,8 +219,18 @@ std::string FunccallNode::to_asm(){
 		ss << "    call prints" << std::endl;
 	}
 	else {
-		std::cout << "Function " << this->name << " is not defined" << std::endl;
-		exit(-1);
+		Variable* var = roottable.getvar(this->name);
+		if (var == nullptr){
+			std::cout << this->name << " is not defined" << std::endl;
+			exit(-1);
+		}
+		else if (!dynamic_cast<Function*>(var)){
+			std::cout << this->name << " is not a function" << std::endl;
+			exit(-1);
+		}
+		else {
+			ss << "    call " << this->name << std::endl;
+		}
 	}
 	ss << std::endl;
 	return ss.str();

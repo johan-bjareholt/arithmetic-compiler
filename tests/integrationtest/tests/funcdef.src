@@ -1,0 +1,2 @@
+func test(){a=1; printi(a); }
+test()
