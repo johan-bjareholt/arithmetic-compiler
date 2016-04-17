@@ -14,12 +14,12 @@ int main(){
 	roottable.addvar("intnode1", *(new IntClass()));
 
 	// Check that var is in table and is fetchable
-	Class* obj = roottable.getvar("intnode1");
+	Variable* obj = roottable.getvar("intnode1");
 	if (obj == nullptr){
 		std::cout << "Couldn't get variable" << std::endl;
 		exit(-1);
 	}
-	std::cout << obj->to_string() << std::endl;
+	std::cout << obj->to_str() << std::endl;
 	// Remove variable from table and make sure that it's not there
 	roottable.delvar("intnode1");
 	obj = roottable.getvar("intnode1");
