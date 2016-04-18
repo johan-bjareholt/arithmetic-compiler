@@ -6,11 +6,11 @@
 
 class Function : public Variable {
 	public:
-	ArglistNode* arglist;
+	ParlistNode* parlist;
 	BlockNode* funcbody;
 
 	std::string to_str();
 	std::string to_asm();
 
-	Function(ArglistNode& arglist, BlockNode& funcbody);
+	Function(ParlistNode& parlist, BlockNode& funcbody);
 };

@@ -51,6 +51,31 @@ class ArglistNode : public ContainerNode {
 	std::string to_asm();
 };
 
+class ParlistNode : public ContainerNode {
+	public:
+	ParlistNode();
+	std::string to_str();
+	std::string to_asm();
+};
+
+
+class DeclarationNode : public Node {
+	public:
+	std::string name;
+	std::string type; // TODO: change to TypeNode
+	DeclarationNode(std::string type, std::string varname);
+	std::string to_str();
+	std::string to_asm();
+	void dumps_str(std::stringstream& ss, int depth);
+};
+
+class DecllistNode : public ContainerNode {
+	public:
+	DecllistNode();
+	std::string to_str();
+	std::string to_asm();
+};
+
 /*
    Funcdef
 */
@@ -58,9 +83,9 @@ class ArglistNode : public ContainerNode {
 class FuncdefNode : public Node {
 	public:
 	// type
-	ArglistNode* args = nullptr;
+	ParlistNode* args = nullptr;
 	BlockNode* codeblock = nullptr;
-	FuncdefNode(std::string name, ArglistNode* args, BlockNode* codeblock);
+	FuncdefNode(DeclarationNode* declnode, ParlistNode* args, BlockNode* codeblock);
 	std::string to_str();
 	std::string to_asm();
 	void dumps_str(std::stringstream& ss, int depth);

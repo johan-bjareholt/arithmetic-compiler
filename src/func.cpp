@@ -4,8 +4,8 @@
 
 
 
-Function::Function(ArglistNode& arglist, BlockNode& funcbody){
-	this->arglist = &arglist;
+Function::Function(ParlistNode& parlist, BlockNode& funcbody){
+	this->parlist = &parlist;
 	this->funcbody = &funcbody;
 }
 

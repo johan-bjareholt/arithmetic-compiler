@@ -21,6 +21,8 @@
 %type <OperatorNode*> binop
 %type <ReferenceNode*> reference
 %type <ArglistNode*> arglist
+%type <ParlistNode*> parlist
+%type <DeclarationNode*> declaration
 %type <FuncdefNode*> funcdef
 %type <FunccallNode*> funccall
 %type <Node*> command
@@ -117,6 +119,27 @@ arglist	: /* empty */
 			$$->children.push_back($3);
 		}
 
+parlist	: /* empty */
+		{
+			$$ = new ParlistNode();
+		}
+		| declaration
+		{
+			$$ = new ParlistNode();
+			$$->children.push_back($1);
+		}
+		| parlist COMMA declaration
+		{
+			$$ = $1;
+			$$->children.push_back($3);
+		}
+
+declaration: VARNAME VARNAME
+		{
+			$$ = new DeclarationNode($1, $2);
+		}
+		;
+
 value	: INT
 	 	{
 			$$ = new IntNode($1);
@@ -139,10 +162,10 @@ binop	: PLUS
 		}
 		;
 
-funcdef	: VARNAME VARNAME PAR_LEFT arglist PAR_RIGHT BRACE_LEFT block BRACE_RIGHT
+funcdef	: declaration PAR_LEFT parlist PAR_RIGHT BRACE_LEFT block BRACE_RIGHT
 		{
 			// TODO: add type returns, do not ignore type varname
-			$$ = new FuncdefNode($2, $4, $7);
+			$$ = new FuncdefNode($1, $3, $6);
 		}
 
 funccall: VARNAME PAR_LEFT arglist PAR_RIGHT

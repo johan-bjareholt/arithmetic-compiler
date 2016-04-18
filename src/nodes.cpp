@@ -68,7 +68,7 @@ std::string BlockNode::to_asm(){
 ArglistNode::ArglistNode() : ContainerNode(){}
 
 std::string ArglistNode::to_str(){
-	return "explist";
+	return "arglist";
 }
 std::string ArglistNode::to_asm(){
 	std::stringstream ss;
@@ -83,6 +83,46 @@ std::string ArglistNode::to_asm(){
 	}
 	return ss.str();
 }
+
+
+ParlistNode::ParlistNode() : ContainerNode(){}
+
+std::string ParlistNode::to_str(){
+	return "parlist";
+}
+std::string ParlistNode::to_asm(){
+	std::stringstream ss;
+	for (Node* arg : children){
+		ss << arg->to_asm() << std::endl;
+		ss << "    pushq %rax" << std::endl;
+	}
+	const std::string argregs[] = {"%rdi","%rsi","rdx","rcx","r8","r9"};
+	for(int i=0; i<children.size(); i++){
+		ss << "    movq (%rsp)," << argregs[i] << std::endl;
+		ss << "    popq %rax"  << std::endl;
+	}
+	return ss.str();
+}
+
+
+DeclarationNode::DeclarationNode(std::string type, std::string varname){
+	this->type = type;
+	this->name = varname;
+}
+
+std::string DeclarationNode::to_str(){
+	return "declaration";
+}
+
+std::string DeclarationNode::to_asm(){
+	// Fix this
+	return "";
+}
+
+void DeclarationNode::dumps_str(std::stringstream& ss, int depth) {
+	writeline(ss, depth);
+}
+
 
 AssignmentNode::AssignmentNode(std::string name, Node& exp) : Node() {
 	this->name = name;
@@ -143,11 +183,11 @@ std::string AssignmentNode::to_asm(){
    Funcdef
 */
 
-FuncdefNode::FuncdefNode(std::string name, ArglistNode* args, BlockNode* codeblock){
+FuncdefNode::FuncdefNode(DeclarationNode* declnode, ParlistNode* args, BlockNode* codeblock){
 	this->args = args;
 	this->codeblock = codeblock;
 
-	roottable.addvar(name, *(new Function(*args, *codeblock)));
+	roottable.addvar(declnode->name, *(new Function(*args, *codeblock)));
 }
 
 std::string FuncdefNode::to_str(){
